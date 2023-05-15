@@ -1,4 +1,4 @@
-# Contributing to Text Sorter program
+# Contributing
 ## General information
 First of all, thank you for contributing to this wasteland of a project. 
 Second af all, it was not expected that anyone will ever make contributions to this. 

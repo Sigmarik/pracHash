@@ -5,23 +5,23 @@ A program for testing different hash function implementations.
 
 Compile the project (ubuntu linux):
 
-`...# make`
+`$ make`
 
 Clean the project (ubuntu linux):
 
-`...# make clean`
+`$ make clean`
 
 Run the program (ubuntu linux):
 
-`...# make run`
+`$ make run`
 
 Remove build folders (ubuntu linux):
 
-`...# make rmbld`
+`$ make rmbld`
 
 Return project to its original state:
 
-`...# make rm`
+`$ make rm`
 
 ## Research
 As said, the main purpose of the project was comparison of different hash functions.

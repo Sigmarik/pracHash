@@ -14,7 +14,10 @@
 
 #include "hash.h"
 
-hash_t as_is_hash       (const void* begin, const void* end);
+#include "src/utils/config.h"
+
+hash_t ident_hash       (const void* begin, const void* end);
+hash_t mult_hash        (const void* begin, const void* end);
 hash_t floor_hash       (const void* begin, const void* end);
 
 hash_t constant_hash    (const void* begin, const void* end);

@@ -54,15 +54,6 @@ int main(const int argc, const char** argv) {
     log_init("program_log.html", log_threshold, &errno);
     print_label();
 
-    log_printf(STATUS_REPORTS, "status", "Generating input samples.\n");
-    const char* word_list = NULL;
-    int alloc_status = posix_memalign((void**)&word_list, 32, TEST_COUNT * MAX_WORD_LENGTH * sizeof(*word_list));
-    size_t sample_size = TEST_COUNT;
-    _LOG_FAIL_CHECK_(alloc_status == 0, "error", ERROR_REPORTS, return_clean(EXIT_FAILURE), NULL, ENOENT);
-    for (char* fill_ptr = (char*) word_list; fill_ptr < word_list + TEST_COUNT * MAX_WORD_LENGTH; ++fill_ptr) {
-        *fill_ptr = (char) rand();
-    }
-
     log_printf(STATUS_REPORTS, "status", "Initializing the table.\n");
 
     HashTable table = {};
@@ -73,7 +64,17 @@ int main(const int argc, const char** argv) {
     }, NULL, ENOMEM);
     track_allocation(table, HashTable_dtor);
 
-    log_printf(STATUS_REPORTS, "status", "Filling table with words.\n");
+    #ifdef DISTRIBUTION_TEST  //* DISTRIBUTION TEST CASE ==============================
+
+    log_printf(STATUS_REPORTS, "status", "Generating input sample.\n");
+    const char* word_list = NULL;
+    int alloc_status = posix_memalign((void**)&word_list, 32, TEST_COUNT * MAX_WORD_LENGTH * sizeof(*word_list));
+    size_t sample_size = TEST_COUNT;
+    _LOG_FAIL_CHECK_(alloc_status == 0, "error", ERROR_REPORTS, return_clean(EXIT_FAILURE), NULL, ENOENT);
+    generate_data((void*)word_list, (void*)(word_list + TEST_COUNT * MAX_WORD_LENGTH));
+    track_allocation(word_list, free_variable);
+
+    log_printf(STATUS_REPORTS, "status", "Filling table with keys.\n");
 
     for (const char* word_ptr = word_list;
         word_ptr < word_list + sample_size * MAX_WORD_LENGTH;
@@ -89,8 +90,6 @@ int main(const int argc, const char** argv) {
 
     log_printf(STATUS_REPORTS, "status", "The table is ready for testing.\n");
 
-
-    #ifdef DISTRIBUTION_TEST  //* DISTRIBUTION TEST CASE ==============================
 
     log_printf(STATUS_REPORTS, "status", "Opening distribution output file.\n");
 
@@ -117,26 +116,38 @@ int main(const int argc, const char** argv) {
 
     log_printf(STATUS_REPORTS, "status", "Writing header to the file.\n");
 
-    fprintf(out_timetable, "test_id,time\n");
+    fprintf(out_timetable, "test_count,time\n");
 
     log_printf(STATUS_REPORTS, "status", "Starting tests.\n");
 
-    for (unsigned test_id = 0; test_id < TEST_COUNT; ++test_id) {
+    for (unsigned test_size = ; test_size < TEST_COUNT; ++test_size) {
         clock_t start_time = clock();
 
-        for (unsigned repetition_id = 0; repetition_id < TEST_REPETITION; ++repetition_id)
-        for (size_t word_id = 0; word_id < sample_size; ++word_id) {
-            const char* word_ptr = word_list + word_id * MAX_WORD_LENGTH;
+        for (size_t word_id = 0; word_id < test_size; ++word_id) {
+            static char word[MAX_WORD_LENGTH] = "" __attribute__((__aligned__(32)));
+            for (char* ptr = word; ptr < word + MAX_WORD_LENGTH; ++ptr) {
+                *ptr = (char) rand();
+            }
 
-            #if OPTIMIZATION_LEVEL < 1
-            HashTable_find_value(&table, TESTED_HASH(word_ptr, word_ptr + MAX_WORD_LENGTH), word_ptr, strcmp);
-            #else
-            HashTable_find_value(&table, TESTED_HASH(word_ptr, word_ptr + MAX_WORD_LENGTH),
-                _mm256_load_si256((const __m256i*) word_ptr), simd_comparison_placeholder);
-            #endif
+            unsigned op_key = rand() % 100;
+            if (op_key < 50) {
+                #if OPTIMIZATION_LEVEL < 1
+                HashTable_find_value(&table, TESTED_HASH(word, word + MAX_WORD_LENGTH), word, strcmp);
+                #else
+                HashTable_find_value(&table, TESTED_HASH(word, word + MAX_WORD_LENGTH),
+                    _mm256_load_si256((const __m256i*) word), simd_comparison_placeholder);
+                #endif
+            } else {
+                #if OPTIMIZATION_LEVEL < 1
+                HashTable_insert(&table, TESTED_HASH(word, word + MAX_WORD_LENGTH), word, strcmp);
+                #else
+                HashTable_insert(&table, TESTED_HASH(word, word + MAX_WORD_LENGTH),
+                    _mm256_load_si256((const __m256i*) word), simd_comparison_placeholder);
+                #endif
+            }
         }
 
-        fprintf(out_timetable, "%u,%ld\n", test_id, clock() - start_time);
+        fprintf(out_timetable, "%u,%ld\n", test_size, clock() - start_time);
     }
 
     log_printf(STATUS_REPORTS, "status", "Testing is finished. Closing the file.\n");

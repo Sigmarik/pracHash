@@ -20,11 +20,20 @@ static hash_t cycle_right(hash_t num, unsigned short shift) {
     return (num >> shift) + suffix;
 }
 
-hash_t as_is_hash(const void* begin, const void* end) {
+static const hash_t BIG_PRIME = 95966417;
+static const hash_t HASH_STEP_MULTIPLIER = 52196849;
+
+hash_t ident_hash(const void* begin, const void* end) {
     return *(hash_t*)begin;
 }
+
+hash_t mult_hash(const void* begin, const void* end) {
+    return *(hash_t*)begin * BIG_PRIME;
+}
+
 hash_t floor_hash(const void* begin, const void* end) {
-    return (hash_t)(*(double*)begin);
+    double* double_ptr = (double*) begin;
+    return (hash_t) (*double_ptr);
 }
 
 hash_t constant_hash(const void* begin, const void* end)    { SILENCE_UNUSED(begin); SILENCE_UNUSED(end); return 1; }
@@ -54,9 +63,6 @@ hash_t right_shift_hash(const void* begin, const void* end) {
     }
     return sum;
 }
-
-static const hash_t BIG_PRIME = 95966417;
-static const hash_t HASH_STEP_MULTIPLIER = 52196849;
 
 hash_t poly_hash(const void* begin, const void* end) {
     hash_t answer = 0;

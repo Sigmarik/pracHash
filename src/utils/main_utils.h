@@ -23,4 +23,12 @@
  */
 void print_label();
 
+/**
+ * @brief Fill buffer with random data
+ * 
+ * @param begin 
+ * @param end 
+ */
+void generate_data(void* begin, void* end);
+
 #endif

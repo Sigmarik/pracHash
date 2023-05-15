@@ -25,6 +25,20 @@ static const unsigned MAX_WORD_LENGTH = 32;
 #define OPTIMIZATION_LEVEL 0
 #endif
 
+#ifndef GEN_INT
+#ifndef GEN_DOUBLE
+    #define GEN_STRING
+#endif
+#endif
+
+#ifndef MIN_TEST_COUNT
+    static const unsigned MIN_TEST_COUNT = 1000;
+#endif
+
+#ifndef MAX_TEST_COUNT
+    static const unsigned MAX_TEST_COUNT = 100000;
+#endif
+
 #ifndef BUCKET_COUNT
     static const unsigned BUCKET_COUNT = 1000;
 #endif

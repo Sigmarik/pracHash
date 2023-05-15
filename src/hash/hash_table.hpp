@@ -120,7 +120,6 @@ void HashTable_ctor(HashTable* table, err_anchor_t err_code) {
 
     for (size_t id = 0; id < BUCKET_COUNT; ++id) {
         table->contents[id] = {};
-        log_printf(STATUS_REPORTS, "status", "Initialising bucket with id %lu.\n", id);
         List_ctor(&table->contents[id], DFLT_HT_CELL_SIZE, err_code);
         if (List_status(&table->contents[id]) != 0) {
             for (size_t rem_id = 0; rem_id < id; ++rem_id) List_dtor(table->contents + rem_id);

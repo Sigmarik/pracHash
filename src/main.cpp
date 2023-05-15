@@ -30,8 +30,6 @@
 #include "hash/hash_functions.h"
 #include "hash/hash_table.hpp"
 
-#include "text_parser/text_parser.h"
-
 #define MAIN
 
 #if OPTIMIZATION_LEVEL >= 1
@@ -120,11 +118,11 @@ int main(const int argc, const char** argv) {
 
     log_printf(STATUS_REPORTS, "status", "Starting tests.\n");
 
-    for (unsigned test_size = ; test_size < TEST_COUNT; ++test_size) {
+    for (unsigned test_size = MIN_TEST_COUNT; test_size < MAX_TEST_COUNT; ++test_size) {
         clock_t start_time = clock();
 
-        for (size_t word_id = 0; word_id < test_size; ++word_id) {
-            static char word[MAX_WORD_LENGTH] = "" __attribute__((__aligned__(32)));
+        for (size_t action_id = 0; action_id < test_size; ++action_id) {
+            static char word[MAX_WORD_LENGTH] __attribute__((__aligned__(32))) = "";
             for (char* ptr = word; ptr < word + MAX_WORD_LENGTH; ++ptr) {
                 *ptr = (char) rand();
             }

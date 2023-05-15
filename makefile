@@ -62,7 +62,6 @@ OPTIMIZATION_LEVEL = 0
 CORE_MAIN_OBJECTS = src/main.o 					\
 			   src/utils/main_utils.o 			\
 			   src/hash/hash_functions.cpp		\
-			   src/text_parser/text_parser.cpp	\
 			   src/utils/common_utils.o $(LIB_OBJECTS)
 
 ifeq ($(OPTIMIZATION_LEVEL), 3)
@@ -77,9 +76,6 @@ main: asset $(addprefix $(PROJ_DIR)/, $(MAIN_OBJECTS))
 
 bmark: asset
 	make CASE_FLAGS="-D TESTED_HASH=murmur_hash -D OPTIMIZATION_LEVEL=$(OPTIMIZATION_LEVEL) -D PERFORMANCE_TEST" CPPFLAGS="$(CPP_BASE_FLAGS)"
-
-pfile: asset
-	make CASE_FLAGS="-D TESTED_HASH=murmur_hash -D OPTIMIZATION_LEVEL=$(OPTIMIZATION_LEVEL) -D TEST_COUNT=10 -D TEST_REPETITION=1 -D PERFORMANCE_TEST" CPPFLAGS="$(CPP_BASE_FLAGS)"
 
 asset:
 	@mkdir -p $(BLD_FOLDER)

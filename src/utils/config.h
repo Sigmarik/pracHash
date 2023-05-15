@@ -39,6 +39,10 @@ static const unsigned MAX_WORD_LENGTH = 32;
     static const unsigned MAX_TEST_COUNT = 100000;
 #endif
 
+#ifndef TEST_COUNT_STEP
+    static const unsigned TEST_COUNT_STEP = 10000;
+#endif
+
 #ifndef BUCKET_COUNT
     static const unsigned BUCKET_COUNT = 1000;
 #endif
